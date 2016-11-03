@@ -6,16 +6,16 @@ def run_ping(hostnames, num_packets, raw_ping_output_filename, aggregated_ping_o
 	host_to_raw = {}
 	host_to_agg = {}
 	for host in hostnames:
-		print(host)
+		#print(host)
 		try: 
-			output = subprocess.check_output("ping -c " + str(num_packets) + " " + host, shell=True)
+			output = subprocess.check_output("ping -O -c " + str(num_packets) + " " + host, shell=True)
 			#output = subprocess.Popen("ping -c " + str(num_packets) + " " + host, shell=True)
-			#print(output)
+			print(output)
 			lines = output.split('\n')
 			for i in range(1, len(lines)-5):
 				parse = lines[i].split('=')
 				rtt = parse[-1].split(' ')[0]
-				if rtt == "Request":
+				if rtt == "Request" or rtt == "no":
 					rtt = -1.0
 				#print(rtt)
 				if host in host_to_raw:
