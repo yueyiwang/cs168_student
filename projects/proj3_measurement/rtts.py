@@ -1,5 +1,7 @@
 import subprocess
 import json
+import matplotlib.pyplot as plot
+from matplotlib.backends import backend_pdf
 
 def run_ping(hostnames, num_packets, raw_ping_output_filename, aggregated_ping_output_filename ):
 	#print("pinging")
@@ -8,7 +10,7 @@ def run_ping(hostnames, num_packets, raw_ping_output_filename, aggregated_ping_o
 	for host in hostnames:
 		#print(host)
 		try: 
-			output = subprocess.check_output("ping -O -c " + str(num_packets) + " " + host, shell=True)
+			output = subprocess.check_output("ping -c " + str(num_packets) + " " + host, shell=True)
 			#output = subprocess.Popen("ping -c " + str(num_packets) + " " + host, shell=True)
 			print(output)
 			lines = output.split('\n')
@@ -64,10 +66,76 @@ def run_ping(hostnames, num_packets, raw_ping_output_filename, aggregated_ping_o
 
 		
 
-# def plot_median_rtt_cdf(agg_ping_results_filesname, output_cdf_filename):
+def plot_median_rtt_cdf(agg_ping_results_filesname, output_cdf_filename):
+	with open(agg_ping_results_filesname) as fh:
+		results = json.load(fh)
+	x_values = []
+	y_values = []
+	median_to_num = {}
+	num_hosts = 0 
+	for host in results:
+		num_hosts += 1
+		median_rtt = results[host]["median_rtt"]
+		if median_rtt in median_to_num:
+			median_to_num[median_rtt] += 1
+		else:
+			median_to_num[median_rtt] = 1
+	plot_cdf(median_to_num, output_cdf_filename, num_hosts)
+
+def plot_cdf(info, output_cdf_filename, num):
+	keys = info.keys()
+	x_values = []
+	y_values = []
+	keys.sort()
+	started = False
+	for i in range(len(keys)):
+		if keys[i] != -1:
+			x_values +=[keys[i]]
+			if not started:
+				#print(y_values[0])
+				#print(median_to_num[keys[i]])
+				#print(keys[i])
+				y_values += [float(info[keys[i]])/float(num)]
+
+				started = True
+			else:
+				y_values += [float(info[keys[i]])/float(num) + float(y_values[len(y_values) - 1])]
+	print(x_values)
+	plot.plot(x_values, y_values, label='Median RTT')
+	plot.legend() # This shows the legend on the plot.
+	plot.grid() # Show grid lines, which makes the plot easier to read.
+	plot.xlabel("Time (ms)") # Label the x-axis.
+	plot.ylabel("CDF") # Label the y-axis.
+	#plot.show()
+	fig = plot.gcf()
+
+	with backend_pdf.PdfPages(output_cdf_filename) as pdf:
+		#pdf.savefig()
+		pdf.savefig(fig)
+	plot.close(fig)
 
 
-# def plot_ping_cdf(raw_ping_results_filename, output_cdf_filename):
+
+def plot_ping_cdf(raw_ping_results_filename, output_cdf_filename):
+	with open(raw_ping_results_filename) as fh:
+		results = json.load(fh)
+	x_values = []
+	y_values = []
+	rtt_to_num = {}
+	num_rtts = 0 
+	#do one 
+	for host in results:
+		rtt_list = results[host]
+		for rtt in rtt_list:
+			num_rtts += 1
+			if rtt in rtt_to_num:
+				rtt_to_num[rtt] += 1
+			else:
+				rtt_to_num[rtt] = 1
+	plot_cdf(rtt_to_num, output_cdf_filename, num_rtts)
 
 
-# run_ping(["google.com"], 5)
+
+
+#run_ping(["google.com"], 100, "raw_google_output.json", "agg_google_output.json")
+plot_ping_cdf('raw_google_output.json', 'raw_rtt_cdf.pdf')
