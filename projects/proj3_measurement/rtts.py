@@ -72,14 +72,16 @@ def plot_median_rtt_cdf(agg_ping_results_filesname, output_cdf_filename):
 	x_values = []
 	y_values = []
 	median_to_num = {}
-	num_hosts = 0 
+	num_hosts = 0
 	for host in results:
-		num_hosts += 1
 		median_rtt = results[host]["median_rtt"]
-		if median_rtt in median_to_num:
-			median_to_num[median_rtt] += 1
-		else:
-			median_to_num[median_rtt] = 1
+		if median_rtt != -1:
+			if median_rtt in median_to_num:
+				median_to_num[median_rtt] += 1
+			else:
+				median_to_num[median_rtt] = 1
+			num_hosts += 1
+
 	plot_cdf(median_to_num, output_cdf_filename, num_hosts, "Median RTTS")
 
 def plot_cdf(info, output_cdf_filename, num, host):
@@ -100,6 +102,7 @@ def plot_cdf(info, output_cdf_filename, num, host):
 				started = True
 			else:
 				y_values += [float(info[keys[i]])/float(num) + float(y_values[len(y_values) - 1])]
+	print(y_values)
 	plot.plot(x_values, y_values, label= host)
 	plot.legend() # This shows the legend on the plot.
 	plot.grid() # Show grid lines, which makes the plot easier to read.
@@ -156,8 +159,9 @@ def percent_has_drop(agg_ping_results_filesname):
 	return float(num) / float(num_hosts)
 
 
-print(percent_all_drop('rtt_a_agg.json'))
-print(percent_has_drop('rtt_a_agg.json'))
+#print(percent_all_drop('rtt_a_agg.json'))
+#print(percent_has_drop('rtt_a_agg.json'))
+plot_median_rtt_cdf("rtt_a_agg.json", "agg_rtt_cdf_a.pdf")
 #plot_ping_cdf('rtt_b_raw.json', 'raw_rtt_cdf_b.pdf')
 #run_ping(["google.com"], 100, "raw_google_output.json", "agg_google_output.json")
 #plot_ping_cdf('raw_google_output.json', 'raw_rtt_cdf.pdf')
