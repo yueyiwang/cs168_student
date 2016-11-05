@@ -80,9 +80,9 @@ def plot_median_rtt_cdf(agg_ping_results_filesname, output_cdf_filename):
 			median_to_num[median_rtt] += 1
 		else:
 			median_to_num[median_rtt] = 1
-	plot_cdf(median_to_num, output_cdf_filename, num_hosts)
+	plot_cdf(median_to_num, output_cdf_filename, num_hosts, "Median RTTS")
 
-def plot_cdf(info, output_cdf_filename, num):
+def plot_cdf(info, output_cdf_filename, num, host):
 	keys = info.keys()
 	x_values = []
 	y_values = []
@@ -100,8 +100,7 @@ def plot_cdf(info, output_cdf_filename, num):
 				started = True
 			else:
 				y_values += [float(info[keys[i]])/float(num) + float(y_values[len(y_values) - 1])]
-	print(x_values)
-	plot.plot(x_values, y_values, label='Median RTT')
+	plot.plot(x_values, y_values, label= host)
 	plot.legend() # This shows the legend on the plot.
 	plot.grid() # Show grid lines, which makes the plot easier to read.
 	plot.xlabel("Time (ms)") # Label the x-axis.
@@ -112,19 +111,19 @@ def plot_cdf(info, output_cdf_filename, num):
 	with backend_pdf.PdfPages(output_cdf_filename) as pdf:
 		#pdf.savefig()
 		pdf.savefig(fig)
-	plot.close(fig)
+	
 
 
 
 def plot_ping_cdf(raw_ping_results_filename, output_cdf_filename):
 	with open(raw_ping_results_filename) as fh:
 		results = json.load(fh)
-	x_values = []
-	y_values = []
-	rtt_to_num = {}
-	num_rtts = 0 
 	#do one 
 	for host in results:
+		x_values = []
+		y_values = []
+		rtt_to_num = {}
+		num_rtts = 0 
 		rtt_list = results[host]
 		for rtt in rtt_list:
 			num_rtts += 1
@@ -132,10 +131,33 @@ def plot_ping_cdf(raw_ping_results_filename, output_cdf_filename):
 				rtt_to_num[rtt] += 1
 			else:
 				rtt_to_num[rtt] = 1
-	plot_cdf(rtt_to_num, output_cdf_filename, num_rtts)
+		plot_cdf(rtt_to_num, output_cdf_filename, num_rtts, host)
+
+def percent_all_drop(agg_ping_results_filesname):
+	with open(agg_ping_results_filesname) as fh:
+		results = json.load(fh)
+	num = 0
+	num_hosts = 0
+	for host in results:
+		if results[host]["drop_rate"] == 100.0:
+			num += 1
+		num_hosts += 1
+	return float(num) / float(num_hosts)
+
+def percent_has_drop(agg_ping_results_filesname):
+	with open(agg_ping_results_filesname) as fh:
+		results = json.load(fh)
+	num = 0
+	num_hosts = 0
+	for host in results:
+		if results[host]["drop_rate"] != 0.0:
+			num += 1
+		num_hosts += 1
+	return float(num) / float(num_hosts)
 
 
-
-
+print(percent_all_drop('rtt_a_agg.json'))
+print(percent_has_drop('rtt_a_agg.json'))
+#plot_ping_cdf('rtt_b_raw.json', 'raw_rtt_cdf_b.pdf')
 #run_ping(["google.com"], 100, "raw_google_output.json", "agg_google_output.json")
-plot_ping_cdf('raw_google_output.json', 'raw_rtt_cdf.pdf')
+#plot_ping_cdf('raw_google_output.json', 'raw_rtt_cdf.pdf')
