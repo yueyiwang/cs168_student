@@ -2,7 +2,6 @@ import subprocess
 import json
 def run_dig(hostname_filename, output_filename, dns_query_server=None):
 	with open(hostname_filename, 'r') as fp:
-<<<<<<< HEAD
 		hostnames = []
 		line = fp.readline()
 		while line != "":
@@ -62,6 +61,40 @@ def parse_no_dns_server(host, output):
 		dig_dict["Queries"] = queries
 	return dig_dict
 
+def parse_with_dns_server(host, output):
+	data = output.split("SECTION:")
+	name_parts = data[1].split(';')[1].split('.')
+	name = name_parts[0] + "." + name_parts[1]
+	host_to_queries = {}
+	host_to_queries['Name'] = name
+	success = True
+	answers = data[2].split(';;')[0]
+	info = data[2].split(';;')[1:]
+	for a in answers.split('\n'):
+		if a == "":
+			continue
+		tokens = a.split()
+		ans = tokens[0]
+		ttl = tokens[1]
+		typ = tokens[2]
+		if tokens[3] != 'A':
+			success = False
+			break
+		data = tokens[4]
+		if 'Queries' not in host_to_queries:
+			host_to_queries['Queries'] = [{}]
+			host_to_queries['Queries'][0]['Answers'] = [{'Queried name': ans, 'Data': data, 'Type': typ, 'TTL': ttl}]
+		else:
+			i = len(host_to_queries['Queries'])
+			host_to_queries['Queries'][0]['Answers'] += [{'Queried name': ans, 'Data': data, 'Type': typ, 'TTL': ttl}]
+	if success:
+		time = info[0].split()[2]
+		host_to_queries['Success'] = success
+		host_to_queries['Queries'][0]['Time'] = time
+	else:
+		host_to_queries['Name'] = host_to_queries['Name'].split('\\')[0]
+		host_to_queries['Success'] = success
+	return host_to_queries
 
 #print(run_dig(["google.com"], "dig_ouput_test.json"))
 
@@ -122,40 +155,6 @@ def get_average_times(filename):
 					final_time += time
 	return [float(total_time) / num_hosts, float(final_time)/num_hosts]
 
-def parse_with_dns_server(host, output):
-	data = output.split("SECTION:")
-	name_parts = data[1].split(';')[1].split('.')
-	name = name_parts[0] + "." + name_parts[1]
-	host_to_queries = {}
-	host_to_queries['Name'] = name
-	success = True
-	answers = data[2].split(';;')[0]
-	info = data[2].split(';;')[1:]
-	for a in answers.split('\n'):
-		if a == "":
-			continue
-		tokens = a.split()
-		ans = tokens[0]
-		ttl = tokens[1]
-		typ = tokens[2]
-		if tokens[3] != 'A':
-			success = False
-			break
-		data = tokens[4]
-		if 'Queries' not in host_to_queries:
-			host_to_queries['Queries'] = [{}]
-			host_to_queries['Queries'][0]['Answers'] = [{'Queried name': ans, 'Data': data, 'Type': typ, 'TTL': ttl}]
-		else:
-			i = len(host_to_queries['Queries'])
-			host_to_queries['Queries'][0]['Answers'] += [{'Queried name': ans, 'Data': data, 'Type': typ, 'TTL': ttl}]
-	if success:
-		time = info[0].split()[2]
-		host_to_queries['Success'] = success
-		host_to_queries['Queries'][0]['Time'] = time
-	else:
-		host_to_queries['Name'] = host_to_queries['Name'].split('\\')[0]
-		host_to_queries['Success'] = success
-	return host_to_queries
 
 #print(run_dig(["google.com"], "dig_ouput_test.json"))
 
