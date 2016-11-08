@@ -32,7 +32,7 @@ def parse_traceroute(raw_traceroute_filename, output_filename):
 	line = f.readline()
 	print(currHost)
 	while (line != ""):
-		if line.split(" ")[0] == "*":
+		if line.split(" ")[5] == "*":
 			continue
 		if line.split(" ")[0] == "traceroute":
 			currHost = line.split(" ")[2]

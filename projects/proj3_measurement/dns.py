@@ -96,7 +96,8 @@ def parse_with_dns_server(host, output):
 		host_to_queries['Success'] = success
 	return host_to_queries
 
-#print(run_dig(["google.com"], "dig_ouput_test.json"))
+# print(run_dig(["google.com"], "dig_ouput_test.json"))
+# run_dig('part3_test_host_filename.txt', 'placeholder.txt', '8.8.8.8')
 
 def get_average_ttls(filename):
 	with open(filename) as fh:
@@ -155,12 +156,6 @@ def get_average_times(filename):
 					final_time += time
 	return [float(total_time) / num_hosts, float(final_time)/num_hosts]
 
-
-#print(run_dig(["google.com"], "dig_ouput_test.json"))
-
-# def get_average_ttls(filename):
-
-
 #print(get_average_times("dig_ouput_test.json"))
 
 # def generate_time_cdfs(json_filename, output_filename):
@@ -168,4 +163,3 @@ def get_average_times(filename):
 
 # def count_different_dns_responses(filename1, filename2):
 
-# run_dig('part3_test_host_filename.txt', 'placeholder.txt', '8.8.8.8')
