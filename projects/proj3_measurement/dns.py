@@ -108,4 +108,4 @@ def parse_with_dns_server(host, output):
 
 # def count_different_dns_responses(filename1, filename2):
 
-run_dig('part3_test_host_filename.txt', 'placeholder.txt', '8.8.8.8')
+# run_dig('part3_test_host_filename.txt', 'placeholder.txt', '8.8.8.8')
