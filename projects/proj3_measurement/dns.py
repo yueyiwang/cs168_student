@@ -1,13 +1,13 @@
 import subprocess
 import json
 def run_dig(hostname_filename, output_filename, dns_query_server=None):
-	# with open(hostname_filename, 'r') as fp:
-	# 	hostnames = []
-	# 	line = fp.readline()
-	# 	while line != "":
-	# 		#print(line)
-	# 		hostnames += [line.split("\n")[0]]
-	# 		line = fp.readline()
+	with open(hostname_filename, 'r') as fp:
+		hostnames = []
+		line = fp.readline()
+		while line != "":
+			#print(line)
+			hostnames += [line.split("\n")[0]]
+			line = fp.readline()
 	hostnames = hostname_filename
 	all_digs = []
 	for host in hostnames:
@@ -23,7 +23,7 @@ def run_dig(hostname_filename, output_filename, dns_query_server=None):
 	with open(output_filename, 'w') as fp:
 		json.dump(all_digs, fp)
 
-		
+
 def parse_no_dns_server(host, output):
 	lines = output.split("\n")
 	dig_dict = {}
@@ -57,11 +57,66 @@ def parse_no_dns_server(host, output):
 		dig_dict["Queries"] = queries
 	return dig_dict
 
-print(run_dig(["google.com"], "dig_ouput_test.json"))
-# def get_average_ttls(filename):
+#print(run_dig(["google.com"], "dig_ouput_test.json"))
+
+def get_average_ttls(filename):
+	with open(filename) as fh:
+		results = json.load(fh)
+	root_TTL = 0
+	tld_TTL = 0
+	other_TTL = 0
+	a_TTL = 0
+	num_root = 0
+	num_tld = 0
+	num_other = 0
+	num_a = 0
+	for host_info in results:
+		if not host_info["Success"]:
+			continue
+		for query in host_info["Queries"]:
+			query_a = 0
+			query_a_ttl = 0
+			for answer in query["Answers"]:
+				ttl = int(answer["TTL"])
+				if "root-servers.net" in answer["Data"]:
+					root_TTL  += ttl
+					num_root += 1
+				elif "gtld-servers.net" in answer["Data"]:
+					tld_TTL += ttl
+					num_tld += 1
+				elif answer["Type"] == "A":
+					query_a_ttl += ttl
+					query_a += 1
+				else:
+					other_TTL += ttl
+					num_other += 1
+		a_TTL += (float(query_a_ttl )/ query_a)
+		num_a += 1
+	return [float(root_TTL)/num_root, float(tld_TTL)/ num_tld, float(other_TTL)/ num_other, float(a_TTL)/ num_a]
 
 
-# def get_average_times(filename):
+#print(get_average_ttls("dig_ouput_test.json"))
+
+def get_average_times(filename):
+	with open(filename) as fh:
+		results = json.load(fh)
+	total_time = 0
+	final_time = 0
+	num_hosts = 0
+	for host_info in results:
+		if not host_info["Success"]:
+			continue
+		num_hosts += 1
+		queries = host_info["Queries"]
+		for query in queries:
+			time = int(query["Time in millis"])
+			total_time += time
+			for answer in query["Answers"]:
+				if answer["Type"] == "A":
+					final_time += time
+	return [float(total_time) / num_hosts, float(final_time)/num_hosts]
+
+#print(get_average_times("dig_ouput_test.json"))
 
 # def generate_time_cdfs(json_filename, output_filename):
 
