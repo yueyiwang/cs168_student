@@ -44,14 +44,25 @@ def parse_traceroute(raw_traceroute_filename, output_filename):
 			if data[1].isdigit():
 				currHop = int(data[1])
 			ASN = data[3].replace('[', '').replace(']', '').replace('A', '').replace('S', '')
+			if ASN == "*":
+				ASN = 'None'
 			name = data[4]
 			ip = data[5].replace('(', '').replace(')', '')
 			if currHost not in host_to_trace:
 				host_to_trace[currHost] = [[{'ip': ip, 'name': name, 'ASN': ASN}]]
 			else:
+				# check if router is in the same hop
 				if len(host_to_trace[currHost]) == currHop:
-					host_to_trace[currHost][currHop-1] += [{'ip': ip, 'name': name, 'ASN': ASN}]
+					# check if duplicate
+					dup = False
+					for router in host_to_trace[currHost][currHop-1]:
+						if ip == router[ip]:
+							dup = True
+							break
+					if not dup:
+						host_to_trace[currHost][currHop-1] += [{'ip': ip, 'name': name, 'ASN': ASN}]
 				else:
+					# this is the first router in a new hop
 					host_to_trace[currHost] += [[{'ip': ip, 'name': name, 'ASN': ASN}]]
 
 		line = f.readline()
@@ -64,5 +75,6 @@ def parse_traceroute(raw_traceroute_filename, output_filename):
 
 #parse_traceroute('raw_trace.out', 'traceroute.json')
 #run_traceroute(["google.com", "facebook.com", "www.berkeley.edu", "allspice.lcs.mit.edu", "todayhumor.co.kr", "www.city.kobe.lg.jp","www.vutbr.cz", "zanvarsity.ac.tz"], 5, "raw_tr_a.out")
-parse_traceroute('raw_tr_a.out', 'trace_a.json')
+#parse_traceroute('raw_tr_a.out', 'trace_a.json')
+run_traceroute(["route-server.eastern.allstream.com"], 3, "raw_tr_b.out")
 
