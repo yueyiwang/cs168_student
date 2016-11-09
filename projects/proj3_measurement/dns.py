@@ -247,6 +247,51 @@ generate_time_cdfs("q3a_500.json", "part3_time_cdfs.pdf")
 print(get_average_times("q3a_500.json"))
 	
 
-
-# def count_different_dns_responses(filename1, filename2):
-
+def count_different_dns_responses(filename1, filename2):
+	with open(filename1) as fh:
+		results = json.load(fh)
+	host_to_ip = {}
+	first_value = 0
+	for host_info in results:
+		if not host_info["Success"]:
+			continue
+		for query in host_info["Queries"]:
+			host_set = []
+			for a in query["Answers"]:
+				if a["Type"] == "A":
+					host_set += [a["Data"]]
+		name = host_info["Name"]
+		if name not in host_to_ip:
+			host_to_ip[name] = []
+		host_info[name] += [set(host_set)]
+	with open(filename2) as fh:
+		results2 = json.load(fh)
+	host_to_ip_2 = {}
+	for host_info in results2:
+		if not host_info["Success"]:
+			continue
+		for query in host_info["Queries"]:
+			host_set = []
+			for a in query["Answers"]:
+				if a["Type"] == "A":
+					host_set += [a["Data"]]
+		name = host_info["Name"]
+		if name not in host_to_ip_2:
+			host_to_ip_2[name] = []
+		host_info[name] += [set(host_set)]
+	second_value = 0
+	for host in host_to_ip:
+		sets = host_to_ip[host]
+		if sets[0] != sets[1] or sets[2] != sets[1] or sets[2] != sets[3] or sets[3] != sets[4]:
+			first_value += 1
+		else:
+			sets2 = host_to_ip_2[host]
+			if sets2[0] != sets2[1] or sets2[2] != sets2[1] or sets2[2] != sets2[3] or sets2[3] != sets2[4]:
+				second_value += 1 
+			else:
+				sets1 = set(sets)
+				if host in host_to_ip_2:
+					sets2 = set(host_to_ip_2[host])
+					if sets2 != sets1:
+						second_value += 1
+	return [first_value, second_value + first_value]
