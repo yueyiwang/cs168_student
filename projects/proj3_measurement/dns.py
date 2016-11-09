@@ -174,25 +174,35 @@ def generate_time_cdfs(json_filename, output_filename):
 		num_hosts += 1
 		queries = host_info["Queries"]
 		total_time = 0
+		final_time = 0
 		for q in queries:
 			time = int(q["Time"])
 			total_time += time
 			for a in q["Answers"]:
 				if a["Type"] == "A":
-					final_to_num[time] = 1
+					final_time = time
+					#final_to_num[time] = 1
+		if final_time != 0:
+			if final_time in final_to_num:
+				final_to_num[final_time] += 1
+			else:
+				final_to_num[final_time] = 1
 		if total_time in total_to_num:
 			total_to_num[total_time] += 1
 		else:
 			total_to_num[total_time] = 1
+		print("total time: ")
+		print(total_time)
 
 	print("num hosts: ")
 	print(num_hosts)
 
+
 	totalx, totaly = plot_cdf(total_to_num, num_hosts)
 	finalx, finaly = plot_cdf(final_to_num, num_hosts)
 
-	#print(totalx)
-	print(finaly)
+	print(totalx, totaly)
+	print(finalx, finaly)
 
 	plot.plot(totalx, totaly, label= "Total time to resolve site")
 	plot.plot(finalx, finaly, label= "Time to resolve final request")
