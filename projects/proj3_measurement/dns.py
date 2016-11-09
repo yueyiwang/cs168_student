@@ -191,11 +191,11 @@ def generate_time_cdfs(json_filename, output_filename):
 	totalx, totaly = plot_cdf(total_to_num, num_hosts)
 	finalx, finaly = plot_cdf(final_to_num, num_hosts)
 
-	print(totalx, totaly)
-	print(finalx, finaly)
+	#print(totalx)
+	print(finaly)
 
 	plot.plot(totalx, totaly, label= "Total time to resolve site")
-	plot.plot(totalx, totaly, label= "Time to resolve final request")
+	plot.plot(finalx, finaly, label= "Time to resolve final request")
 	plot.legend() # This shows the legend on the plot.
 	plot.grid() # Show grid lines, which makes the plot easier to read.
 	plot.xlabel("Time (ms)") # Label the x-axis.
@@ -215,22 +215,26 @@ def plot_cdf(info, num):
 	keys.sort()
 	started = False
 	#print(num)
+	prev = 0
 	for i in range(len(keys)):
 		if keys[i] != -1:
 			x_values +=[keys[i]]
 			if not started:
-				print("first info value: ")
-				print(info[keys[i]])
-				print("num: ")
-				print(num)
+				# print("first info value: ")
+				# print(info[keys[i]])
+				# print("num: ")
+				# print(num)
 				y_values += [float(info[keys[i]])/float(num)]
+				prev = info[keys[i]]
 				started = True
 			else:
-				y_values += [float(info[keys[i]])/float(num) + float(y_values[len(y_values) - 1])]
+				prev += info[keys[i]]
+				y_values += [float(prev)/float(num)]
 	#print(y_values)
 	return x_values, y_values
 
-generate_time_cdfs("dig_ouput_test.json", "part3_time_cdfs.pdf")
+generate_time_cdfs("q3a_500.json", "part3_time_cdfs.pdf")
+print(get_average_times("q3a_500.json"))
 	
 
 
