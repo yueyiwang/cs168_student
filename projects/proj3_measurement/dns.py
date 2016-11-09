@@ -1,5 +1,8 @@
 import subprocess
 import json
+import matplotlib.pyplot as plot
+from matplotlib.backends import backend_pdf
+
 def run_dig(hostname_filename, output_filename, dns_query_server=None):
 	with open(hostname_filename, 'r') as fp:
 		hostnames = []
@@ -8,7 +11,7 @@ def run_dig(hostname_filename, output_filename, dns_query_server=None):
 			#print(line)
 			hostnames += [line.split("\n")[0]]
 			line = fp.readline()
-	hostnames = hostname_filename
+	# hostnames = hostname_filename
 	all_digs = []
 	for host in hostnames:
 		print(host)
@@ -97,6 +100,7 @@ def parse_with_dns_server(host, output):
 	return host_to_queries
 
 # print(run_dig(["google.com"], "dig_ouput_test.json"))
+# run_dig("part3_test_host_filename.txt", "dig_ouput_test.json")
 # run_dig('part3_test_host_filename.txt', 'placeholder.txt', '8.8.8.8')
 
 def get_average_ttls(filename):
@@ -149,7 +153,7 @@ def get_average_times(filename):
 		num_hosts += 1
 		queries = host_info["Queries"]
 		for query in queries:
-			time = int(query["Time in millis"])
+			time = int(query["Time"])
 			total_time += time
 			for answer in query["Answers"]:
 				if answer["Type"] == "A":
@@ -158,7 +162,76 @@ def get_average_times(filename):
 
 #print(get_average_times("dig_ouput_test.json"))
 
-# def generate_time_cdfs(json_filename, output_filename):
+def generate_time_cdfs(json_filename, output_filename):
+	with open(json_filename) as fh:
+		results = json.load(fh)
+	num_hosts = 0
+	total_to_num = {}
+	final_to_num = {}
+	for host_info in results:
+		if not host_info["Success"]:
+			continue
+		num_hosts += 1
+		queries = host_info["Queries"]
+		total_time = 0
+		for q in queries:
+			time = int(q["Time"])
+			total_time += time
+			for a in q["Answers"]:
+				if a["Type"] == "A":
+					final_to_num[time] = 1
+		if total_time in total_to_num:
+			total_to_num[total_time] += 1
+		else:
+			total_to_num[total_time] = 1
+
+	print("num hosts: ")
+	print(num_hosts)
+
+	totalx, totaly = plot_cdf(total_to_num, num_hosts)
+	finalx, finaly = plot_cdf(final_to_num, num_hosts)
+
+	print(totalx, totaly)
+	print(finalx, finaly)
+
+	plot.plot(totalx, totaly, label= "Total time to resolve site")
+	plot.plot(totalx, totaly, label= "Time to resolve final request")
+	plot.legend() # This shows the legend on the plot.
+	plot.grid() # Show grid lines, which makes the plot easier to read.
+	plot.xlabel("Time (ms)") # Label the x-axis.
+	plot.ylabel("CDF") # Label the y-axis.
+	#plot.show()
+	fig = plot.gcf()
+
+	with backend_pdf.PdfPages(output_filename) as pdf:
+		#pdf.savefig()
+		pdf.savefig(fig)
+
+
+def plot_cdf(info, num):
+	keys = info.keys()
+	x_values = []
+	y_values = []
+	keys.sort()
+	started = False
+	#print(num)
+	for i in range(len(keys)):
+		if keys[i] != -1:
+			x_values +=[keys[i]]
+			if not started:
+				print("first info value: ")
+				print(info[keys[i]])
+				print("num: ")
+				print(num)
+				y_values += [float(info[keys[i]])/float(num)]
+				started = True
+			else:
+				y_values += [float(info[keys[i]])/float(num) + float(y_values[len(y_values) - 1])]
+	#print(y_values)
+	return x_values, y_values
+
+generate_time_cdfs("dig_ouput_test.json", "part3_time_cdfs.pdf")
+	
 
 
 # def count_different_dns_responses(filename1, filename2):
