@@ -1,0 +1,58 @@
+- PART 1 -
+
+
+1. Percentage of websites that did not respond at all: 0.22
+	Percentage of websites that had at least one dropped: 0.23
+
+2.
+todayhumor.co.kr: median RTT: 79.044, maximum RTT: 95.263, loss rate = 0.0
+google.com: median RTT: 2.761, maximum RTT: 6.417, loss rate = 0.0
+taobao.com: median RTT:321.887, maximum RTT: 337.84., loss rate = 4.0
+zanvarsity.ac.tz: median RTT: 282.343, maximum RTT:436.014, loss rate = 0.0
+
+3. 
+median:
+google.com: 2.761 ms
+zanvarsity.ac.tz: 282.343
+
+speed of light
+google.com: 0.000189 ms
+zanvarsity.ac.tz: 0.0534 ms
+
+multiplier
+google.com: 14608.5
+zanvarsity.ac.tz: 5287.3
+
+Reasons not speed of light:
+1.) The ping does not travel through air and is not a straight line, so it will be slowed down through the different mediums (i.e. glass, fiber). 
+2.) There is no router that directly connects between Berkeley and each server so there will be extra distance and possible traffic to cause queuing delays and each router can cause transmission delays. 
+
+
+- PART 2 -
+
+1. 
+a.)AS directly connected to Berkeley: AS2152
+b.) Site that traverses most routers: zanvarsity.ac.tz and  www.vutbr.cz; site that traverse least routers: www.berkeley.edu
+c.) 
+mercury.lcs.mit.edu:
+[10.142.140.1] -> [128.32.0.58] -> [128.32.0.66] -> [137.164.27.132] -> [137.164.26.142] -> [198.71.45.24] -> [198.71.45.18] -> [198.71.45.14] -> [198.71.45.9] -> [192.5.89.17] -> [207.210.143.110] -> [18.192.7.1] -> [18.192.3.2, 18.192.2.2] -> [128.30.13.6] -> [128.30.0.246] -> [18.26.0.122]
+
+todayhumor.co.kr:
+[10.142.140.1] -> [128.32.0.58] -> [128.32.0.66] -> [137.164.50.16] -> [137.164.22.27] -> [4.15.122.45] -> [4.69.140.121] -> [213.140.53.132] -> [176.52.250.17, 94.142.127.205, 94.142.127.190, 213.140.37.185, ] -> [84.16.15.129, 84.16.14.189] -> [84.16.14.189] -> [176.52.253.225, 141.101.121.191]
+
+google.com:
+[10.142.140.1] -> [128.32.0.58] -> [128.32.0.38] -> [137.164.50.30] -> [74.125.48.172] -> [108.170.242.225, 108.170.243.1] -> [108.170.237.105, 108.170.237.107] -> [216.58.194.206]
+
+www.city.kobe.lg.jp:
+[10.142.140.1] -> [128.32.0.58] -> [128.32.0.66] -> [137.164.50.16] -> [137.164.22.11] -> [137.164.47.174] -> [198.32.176.66] -> [111.87.3.29, 124.211.34.125, 124.211.34.133, 111.87.3.5] -> [203.181.100.185, 203.181.100.193, 203.181.100.213] -> [113.157.227.38, 113.157.227.114, 113.157.227.14, 113.157.227.118, 113.157.227.10] -> [125.29.30.126] -> [121.83.230.230, 121.83.230.226] -> [121.83.231.126, 121.83.231.122] -> [218.228.242.6] -> [203.140.74.187] -> [202.246.160.48]
+
+zanvarsity.ac.tz:
+[10.142.140.1] -> [128.32.0.58] -> [128.32.0.66] -> [137.164.50.16] -> [137.164.22.27] -> [4.15.122.45] -> [4.69.167.74, 4.69.167.86, 4.69.167.82, 4.69.167.90] -> [4.69.167.102, 4.69.167.90, 4.69.167.78, 4.69.167.82, 4.69.167.98] -> [212.113.9.182] -> [41.212.1.86] -> [41.212.2.82] -> [41.204.128.169] -> [41.204.148.5]
+
+facebook.com:
+[10.142.140.1] -> [128.32.0.58] -> [128.32.0.66] -> [137.164.50.16] -> [137.164.22.7] -> [137.164.11.0] -> [103.4.98.188, 103.4.98.228] -> [31.13.29.107, 31.13.29.105, 31.13.29.69, 31.13.29.111, 31.13.29.103] -> [173.252.67.115, 173.252.67.159, 173.252.67.167, 173.252.67.9] -> [31.13.70.36]
+
+
+
+ - PART 3 -
+ 3. a) average root TTL = 29459.715151515153, average TLD TTL=  172800.0, average other TTL 131214.12155137945, terminating TTL = 8029.393939393939
