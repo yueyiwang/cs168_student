@@ -89,6 +89,8 @@ b.) All 4 are non symmetric
 c.) Routers may share same IP address, router failure, redirection of heavy traffic (different optimized path)
 
  - PART 3 -
- 3. a) average root TTL = 29.459, average TLD TTL=  172.80, average other TTL 145.734, terminating TTL = 6.7844
- c) first trial: 7, both trials: 10
+ 3. a) average root TTL = 451.303, average TLD TTL=  172.80, average other TTL 124.883, terminating TTL = 8.108
+c) first trial: 7, both trials: 10
+d) first trial: 7, from france: 82
+e) 
 
