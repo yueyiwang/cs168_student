@@ -52,7 +52,26 @@ zanvarsity.ac.tz:
 facebook.com:
 [10.142.140.1] -> [128.32.0.58] -> [128.32.0.66] -> [137.164.50.16] -> [137.164.22.7] -> [137.164.11.0] -> [103.4.98.188, 103.4.98.228] -> [31.13.29.107, 31.13.29.105, 31.13.29.69, 31.13.29.111, 31.13.29.103] -> [173.252.67.115, 173.252.67.159, 173.252.67.167, 173.252.67.9] -> [31.13.70.36]
 
+2.
+a.) 
+route-server.ip-plus.net
+# hops from my computer to server: 14
+# hops from server to my computer: 13
 
+route-views.oregon-ix.net
+# hops from my computer to server: 8
+# hops from server to my computer: 8
+
+route-views.on.bb.telus.com
+# hops from my computer to server: 10
+# hops from server to my computer: 13
+
+route-server.east.bb.allstream.net
+# hops from my computer to server: 11 + dropped
+# hops from server to my computer: 1 + dropped
+
+b.) All 4 are non symmetric
+c.) Routers may share same IP address, router failure, redirection of heavy traffic (different optimized path)
 
  - PART 3 -
  3. a) average root TTL = 29459.715151515153, average TLD TTL=  172800.0, average other TTL 131214.12155137945, terminating TTL = 8029.393939393939
