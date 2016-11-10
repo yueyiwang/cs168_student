@@ -63,6 +63,9 @@ def parse_no_dns_server(host, output):
 	if success:
 		dig_dict["Success"] = True
 		dig_dict["Queries"] = queries
+	else:
+		dig_dict["Success"] = False
+		
 	return dig_dict
 
 def parse_with_dns_server(host, output):
@@ -177,7 +180,7 @@ def get_average_ttls(filename):
 	return [float(root_TTL)/roots, float(tld_TTL)/ tlds, float(other_TTL)/ others, float(a_TTL)/ answers]
 
 
-print(get_average_ttls("dig_ouput_test.json"))
+#print(get_average_ttls("dig_ouput_test.json"))
 
 def get_average_times(filename):
 	with open(filename) as fh:
@@ -301,7 +304,7 @@ def count_different_dns_responses(filename1, filename2):
 		name = host_info["Name"]
 		if name not in host_to_ip:
 			host_to_ip[name] = []
-		host_info[name] += [set(host_set)]
+		host_to_ip[name] += [set(host_set)]
 	with open(filename2) as fh:
 		results2 = json.load(fh)
 	host_to_ip_2 = {}
@@ -333,3 +336,5 @@ def count_different_dns_responses(filename1, filename2):
 					if sets2 != sets1:
 						second_value += 1
 	return [first_value, second_value + first_value]
+
+print(count_different_dns_responses("q3/first_run.json", "q3/second_run.json"))
