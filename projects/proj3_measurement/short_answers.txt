@@ -90,7 +90,16 @@ c.) Routers may share same IP address, router failure, redirection of heavy traf
 
  - PART 3 -
  3. a) average root TTL = 451.303, average TLD TTL=  172.80, average other TTL 124.883, terminating TTL = 8.108
-c) first trial: 7, both trials: 10
-d) first trial: 7, from france: 82
-e) 
+b.) see graphs
+c.) 7, 10
+d.) 7, 82
+e.)
+Facebook is different
+us vs. france 
+157.240.2.35 vs 31.13.92.36
+57.921 vs. 162.472
 
+They are traveling different routes to different locations. They have different DNS servers for different locations, so it’ll travel to the closest one.
+
+
+f) It would be faster. Without +trace, the target nameserver resolves the query directly instead of resolving the query and reporting each result from the top down.
