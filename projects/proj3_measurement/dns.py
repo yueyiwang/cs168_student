@@ -12,20 +12,21 @@ def run_dig(hostname_filename, output_filename, dns_query_server=None):
 			hostnames += [line.split("\n")[0]]
 			line = fp.readline()
 	# hostnames = hostname_filename
+	hostnames *= 5
 	all_digs = []
 	for host in hostnames:
 		print(host)
 		if dns_query_server == None:
 			output = subprocess.check_output("dig +trace +tries=1 +nofail " + host + " 2>&1", shell=True)
 			dig_dict = parse_no_dns_server(host, output)
-			print(output)
+			#print(output)
 			all_digs += [dig_dict]
 		else:
 			output = subprocess.check_output("dig " + host + "@" + dns_query_server + " 2>&1", shell=True)
 			dig_dict = parse_with_dns_server(host, output)
 			all_digs += [dig_dict]
 
-		print(all_digs)
+		#print(all_digs)
 
 	with open(output_filename, 'w') as fp:
 		json.dump(all_digs, fp)
@@ -101,45 +102,82 @@ def parse_with_dns_server(host, output):
 
 # print(run_dig(["google.com"], "dig_ouput_test.json"))
 # run_dig("part3_test_host_filename.txt", "dig_ouput_test.json")
-# run_dig('part3_test_host_filename.txt', 'placeholder.txt', '8.8.8.8')
+#run_dig('alexa_top_100', 'first_run.json')
 
 def get_average_ttls(filename):
 	with open(filename) as fh:
 		results = json.load(fh)
-	root_TTL = 0
-	tld_TTL = 0
-	other_TTL = 0
-	a_TTL = 0
-	num_root = 0
-	num_tld = 0
-	num_other = 0
-	num_a = 0
+	root_servers = {}
+	tld_servers = {}
+	other_servers = {}
+	answer_servers = {}
 	for host_info in results:
 		if not host_info["Success"]:
 			continue
 		for query in host_info["Queries"]:
-			query_a = 0
-			query_a_ttl = 0
 			for answer in query["Answers"]:
 				ttl = int(answer["TTL"])
-				if "root-servers.net" in answer["Data"]:
-					root_TTL  += ttl
-					num_root += 1
-				elif "gtld-servers.net" in answer["Data"]:
-					tld_TTL += ttl
-					num_tld += 1
+				server = answer["Data"]
+				if "root-servers.net" in server:
+					if server not in root_servers:
+						root_servers[server] = (1, [ttl])
+					else:
+						num, lst = root_servers[server]
+						root_servers[server] = (num + 1, lst + [ttl])
+				elif "gtld-servers.net" in server:
+					if server not in tld_servers:
+						tld_servers[server] = (1, [ttl])
+					else:
+						num, lst = tld_servers[server]
+						tld_servers[server] = (num + 1, lst + [ttl])
 				elif answer["Type"] == "A":
-					query_a_ttl += ttl
-					query_a += 1
+					if server not in answer_servers:
+						answer_servers[server] = (1, [ttl])
+					else:
+						num, lst = answer_servers[server]
+						answer_servers[server] = (num + 1, lst + [ttl])
 				else:
-					other_TTL += ttl
-					num_other += 1
-		a_TTL += (float(query_a_ttl )/ query_a)
-		num_a += 1
-	return [float(root_TTL)/num_root, float(tld_TTL)/ num_tld, float(other_TTL)/ num_other, float(a_TTL)/ num_a]
+					if server not in other_servers:
+						other_servers[server] = (1, [ttl])
+					else:
+						num, lst = other_servers[server]
+						other_servers[server] = (num + 1, lst + [ttl])
+	answer = []
+	print(root_servers)
+	for root in root_servers:
+		root_servers[root] = float(sum(root_servers[root][1])) / root_servers[root][0]
+	for tld in tld_servers:
+		tld_servers[tld] = float(sum(tld_servers[tld][1])) / tld_servers[tld][0]
+	for other in other_servers:
+		other_servers[other] = float(sum(other_servers[other][1])) / other_servers[other][0]
+	for answer in answer_servers:
+		answer_servers[answer] = float(sum(answer_servers[answer][1])) / answer_servers[answer][0]
+	root_TTL = 0 
+	roots = 0
+	for root in root_servers:
+		roots += 1
+		root_TTL += root_servers[root]
+	tld_TTL = 0 
+	tlds = 0
+	for tld in tld_servers:
+		tlds += 1
+		tld_TTL += tld_servers[tld]
+	other_TTL = 0 
+	others = 0
+	for server in other_servers:
+		others += 1
+		other_TTL += other_servers[server]
+	a_TTL = 0 
+	answers = 0
+
+	for server in answer_servers:
+		answers += 1
+		a_TTL += answer_servers[server]
+
+	return [float(root_TTL)/roots, float(tld_TTL)/ tlds, float(other_TTL)/ others, float(a_TTL)/ answers]
 
 
-#print(get_average_ttls("dig_ouput_test.json"))
+print(get_average_ttls("dig_ouput_test.json"))
 
 def get_average_times(filename):
 	with open(filename) as fh:
@@ -201,8 +239,8 @@ def generate_time_cdfs(json_filename, output_filename):
 	totalx, totaly = plot_cdf(total_to_num, num_hosts)
 	finalx, finaly = plot_cdf(final_to_num, num_hosts)
 
-	print(totalx, totaly)
-	print(finalx, finaly)
+	#print(totalx, totaly)
+	#print(finalx, finaly)
 
 	plot.plot(totalx, totaly, label= "Total time to resolve site")
 	plot.plot(finalx, finaly, label= "Time to resolve final request")
@@ -243,9 +281,9 @@ def plot_cdf(info, num):
 	#print(y_values)
 	return x_values, y_values
 
-generate_time_cdfs("q3a_500.json", "part3_time_cdfs.pdf")
-print(get_average_times("q3a_500.json"))
-	
+#generate_time_cdfs("q3a_500.json", "part3_time_cdfs.pdf")
+#print(get_average_ttls("q3a_500.json"))
+
 
 def count_different_dns_responses(filename1, filename2):
 	with open(filename1) as fh:
