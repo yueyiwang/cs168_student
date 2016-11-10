@@ -61,7 +61,7 @@ www.city.kobe.lg.jp: 5
 zanvarsity.ac.tz: 5
 www.vutbr.cz: 2
 
-e.) 
+e.) One advantage of stable is that you can store less data since you only need one router for each destination. 
 
 
 
@@ -90,4 +90,5 @@ c.) Routers may share same IP address, router failure, redirection of heavy traf
 
  - PART 3 -
  3. a) average root TTL = 29.459, average TLD TTL=  172.80, average other TTL 145.734, terminating TTL = 6.7844
+ c) first trial: 7, both trials: 10
 
