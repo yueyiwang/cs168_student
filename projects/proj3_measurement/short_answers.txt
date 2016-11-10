@@ -52,6 +52,21 @@ zanvarsity.ac.tz:
 facebook.com:
 [10.142.140.1] -> [128.32.0.58] -> [128.32.0.66] -> [137.164.50.16] -> [137.164.22.7] -> [137.164.11.0] -> [103.4.98.188, 103.4.98.228] -> [31.13.29.107, 31.13.29.105, 31.13.29.69, 31.13.29.111, 31.13.29.103] -> [173.252.67.115, 173.252.67.159, 173.252.67.167, 173.252.67.9] -> [31.13.70.36]
 
+d.) google.com: 2
+facebook.com: 5
+www.berkeley.edu: 2
+allspice.lcs.mit.edu: 4
+todayhumor.co.kr: 5
+www.city.kobe.lg.jp: 5
+zanvarsity.ac.tz: 5
+www.vutbr.cz: 2
+
+e.) 
+
+
+
+
+
 2.
 a.) 
 route-server.ip-plus.net
