@@ -185,7 +185,7 @@ def get_average_ttls(filename):
 		a_TTL += answer_servers[server]
 	print(roots)
 
-	return [float(root_TTL)/roots, float(tld_TTL)/ tlds, float(other_TTL)/ others, float(a_TTL)/ answers]
+	return [float(root_TTL)/roots/1000, float(tld_TTL)/ tlds/1000, float(other_TTL)/ others/1000, float(a_TTL)/ answers/1000]
 
 
 print(get_average_ttls("eric_dns_b.json"))
