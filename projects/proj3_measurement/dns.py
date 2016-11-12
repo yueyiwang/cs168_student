@@ -16,16 +16,21 @@ def run_dig(hostname_filename, output_filename, dns_query_server=None):
 	hostnames *= 5
 	all_digs = []
 	for host in hostnames:
-		print(host)
-		if dns_query_server == None:
-			output = subprocess.check_output("dig +trace +tries=1 +nofail " + host + " 2>&1", shell=True)
-			dig_dict = parse_no_dns_server(host, output)
-			#print(output)
-			all_digs += [dig_dict]
-		else:
-			output = subprocess.check_output("dig " + host + "@" + dns_query_server + " 2>&1", shell=True)
-			dig_dict = parse_with_dns_server(host, output)
-			all_digs += [dig_dict]
+		try:
+			#print(host)
+			if dns_query_server == None:
+				output = subprocess.check_output("dig +trace +tries=1 +nofail " + host + " 2>&1", shell=True)
+				dig_dict = parse_no_dns_server(host, output)
+				#print(output)
+				all_digs += [dig_dict]
+			else:
+				output = subprocess.check_output("dig " + host + " @" + dns_query_server + " 2>&1", shell=True)
+				dig_dict = parse_with_dns_server(host, output)
+				all_digs += [dig_dict]
+		except subprocess.CalledProcessError:
+			dig_dict = {}
+			dig_dict[utils.NAME_KEY] = host
+			dig_dict[utils.SUCCESS_KEY] = False
 
 		#print(all_digs)
 
@@ -52,10 +57,10 @@ def parse_no_dns_server(host, output):
 		elif tokens[0] == ";" or tokens[0] == ";;":
 			continue
 		current_answer = {}
-		current_answer[utils.QUERIED_NAME_KEY = tokens[0]
+		current_answer[utils.QUERIED_NAME_KEY] = tokens[0]
 		current_answer[utils.ANSWER_DATA_KEY] = tokens[4]
 		current_answer[utils.TYPE_KEY] = tokens[3]
-		if tokens[3] == "A":
+		if tokens[3] == "A" or tokens[3] == "CNAME":
 			success = True
 		current_answer[utils.TTL_KEY] = tokens[1]
 		if utils.ANSWERS_KEY not in current_dict:
@@ -84,10 +89,11 @@ def parse_with_dns_server(host, output):
 		tokens = a.split()
 		ans = tokens[0]
 		ttl = tokens[1]
-		typ = tokens[2]
+		typ = tokens[3]
 		if tokens[3] != 'A':
-			success = False
-			break
+			if tokens[3] != 'CNAME':
+				success = False
+				break
 		data = tokens[4]
 		if utils.QUERIES_KEY not in host_to_queries:
 			host_to_queries[utils.QUERIES_KEY] = [{}]
@@ -106,7 +112,10 @@ def parse_with_dns_server(host, output):
 
 # print(run_dig(["google.com"], "dig_ouput_test.json"))
 # run_dig("part3_test_host_filename.txt", "dig_ouput_test.json")
-#run_dig('alexa_top_100', 'first_run.json')
+
+# Korean 202.68.250.174
+#run_dig('alexa_top_100', 'q3/from_korea.json', '202.68.250.174')
+
 
 def get_average_ttls(filename):
 	with open(filename) as fh:
@@ -121,95 +130,71 @@ def get_average_ttls(filename):
 		for query in host_info[utils.QUERIES_KEY]:
 			name = host_info[utils.NAME_KEY]
 			for answer in query[utils.ANSWERS_KEY]:
-				ttl = int(answer[utils.TTL_KEY])
+				ttl = answer[utils.TTL_KEY]
 				server = answer[utils.QUERIED_NAME_KEY]
-				if answer[utils.TYPE_KEY] == "A":
+				if answer[utils.TYPE_KEY] == "A" or answer[utils.TYPE_KEY] == "CNAME":
 					if name not in answer_servers:
-						answer_servers[name] = (1, [ttl])
+						answer_servers[name] = [ttl]
 					else:
-						num, lst = answer_servers[name]
-						answer_servers[name] = (num + 1, lst + [ttl])
+						lst = answer_servers[name]
+						answer_servers[name] = lst + [ttl]
 
 				elif server == ".":
-					if int(ttl) > 400000:
-						print(ttl)
 					if name not in root_servers:
-						root_servers[name] = (1, [ttl])
+						root_servers[name] = [ttl]
 					else:
-						num, lst = root_servers[name]
-						root_servers[name] = (num + 1, lst + [ttl])
+						lst = root_servers[name]
+						root_servers[name] = lst + [ttl]
 				elif server.count(".") == 1:
 					if name not in tld_servers:
-						tld_servers[name] = (1, [ttl])
+						tld_servers[name] = [ttl]
 					else:
-						num, lst = tld_servers[name]
-						tld_servers[name] = (num + 1, lst + [ttl])
+						lst = tld_servers[name]
+						tld_servers[name] = lst + [ttl]
 				else:
 					if name not in other_servers:
-						other_servers[name] = (1, [ttl])
+						other_servers[name] = [ttl]
 					else:
-						num, lst = other_servers[name]
-						other_servers[name] = (num + 1, lst + [ttl])
+						lst = other_servers[name]
+						other_servers[name] = lst + [ttl]
 	answer = []
-
+	a_TTL = []
+	other_TTL = []
+	tld_TTL = []
+	root_TTL = []
 	for root in root_servers:
-		root_servers[root] = float(sum(root_servers[root][1])) / root_servers[root][0]
+		root_TTL += [np.mean(root_servers[root])]
 	for tld in tld_servers:
-		tld_servers[tld] = float(sum(tld_servers[tld][1])) / tld_servers[tld][0]
+		tld_TTL += [np.mean(tld_servers[tld])]
 	for other in other_servers:
-		other_servers[other] = float(sum(other_servers[other][1])) / other_servers[other][0]
+		other_TTL += [np.mean(other_servers[other])]
 	for answer in answer_servers:
-		answer_servers[answer] = float(sum(answer_servers[answer][1])) / answer_servers[answer][0]
-	root_TTL = 0 
-	roots = 0
-
-	for root in root_servers:
-		roots += 1
-		root_TTL += root_servers[root]
-	#print(root_servers)
-	tld_TTL = 0 
-	tlds = 0
-	for tld in tld_servers:
-		tlds += 1
-		tld_TTL += tld_servers[tld]
-	other_TTL = 0 
-	others = 0
-	for server in other_servers:
-		others += 1
-		other_TTL += other_servers[server]
-	a_TTL = 0 
-	answers = 0
-
-	for server in answer_servers:
-		answers += 1
-		a_TTL += answer_servers[server]
-	print(roots)
-
-	return [float(root_TTL)/roots, float(tld_TTL)/ tlds, float(other_TTL)/ others, float(a_TTL)/ answers]
+		a_TTL += [np.mean(answer_servers[answer])]
+	return [np.mean(root_TTL), np.mean(tld_TTL), np.mean(other_TTL), np.mean(a_TTL)]
 
 
-print(get_average_ttls("q3/first_run.json"))
+#print(get_average_ttls("q3/first_run.json"))
 
 def get_average_times(filename):
 	with open(filename) as fh:
 		results = json.load(fh)
-	total_time = 0
-	final_time = 0
-	num_hosts = 0
+	total_time = []
+	final_time = []
 	for host_info in results:
 		if not host_info[utils.SUCCESS_KEY]:
 			continue
-		num_hosts += 1
 		queries = host_info[utils.QUERIES_KEY]
+		tmp_final = []
 		for query in queries:
-			time = int(query[utils.TIME_KEY])
-			total_time += time
+			time = query[utils.TIME_KEY]
+			total_time += [time]
 			for answer in query[utils.ANSWERS_KEY]:
-				if answer[utils.TYPE_KEY] == "A":
-					final_time += time
-	return [float(total_time) / num_hosts, float(final_time)/num_hosts]
+				if answer[utils.TYPE_KEY] == "A" or answer[utils.TYPE_KEY] == "CNAME":
+					tmp_final += [time]
+		final_time += [np.mean(tmp_final)]
+	return [np.mean(total_time), np.mean(final_time)]
 
-#print(get_average_times("dig_ouput_test.json"))
+#print(get_average_times("q3/from_korea.json"))
 
 def generate_time_cdfs(json_filename, output_filename):
 	with open(json_filename) as fh:
@@ -228,7 +213,7 @@ def generate_time_cdfs(json_filename, output_filename):
 			time = int(q[utils.TIME_KEY])
 			total_time += time
 			for a in q[utils.ANSWERS_KEY]:
-				if a[utils.TYPE_KEY] == "A":
+				if a[utils.TYPE_KEY] == "A" or a[utils.TYPE_KEY] == "CNAME":
 					final_time = time
 					#final_to_num[time] = 1
 		if final_time != 0:
@@ -240,11 +225,11 @@ def generate_time_cdfs(json_filename, output_filename):
 			total_to_num[total_time] += 1
 		else:
 			total_to_num[total_time] = 1
-		print("total time: ")
-		print(total_time)
+		#print("total time: ")
+		#print(total_time)
 
-	print("num hosts: ")
-	print(num_hosts)
+	#print("num hosts: ")
+	#print(num_hosts)
 
 
 	totalx, totaly = plot_cdf(total_to_num, num_hosts)
@@ -292,7 +277,7 @@ def plot_cdf(info, num):
 	#print(y_values)
 	return x_values, y_values
 
-#generate_time_cdfs("q3a_500.json", "part3_time_cdfs.pdf")
+#generate_time_cdfs("q3/updated_first_run.json", "q3/updated_part3_time_cdfs.pdf")
 #print(get_average_ttls("q3a_500.json"))
 
 
@@ -302,13 +287,13 @@ def count_different_dns_responses(filename1, filename2):
 	host_to_ip = {}
 	first_value = 0
 	for host_info in results:
-		if not host_info[util.SUCCESS_KEY]:
+		if not host_info[utils.SUCCESS_KEY]:
 			continue
-		for query in host_info[util.QUERIES_KEY]:
+		for query in host_info[utils.QUERIES_KEY]:
 			host_set = []
-			for a in query[util.ANSWERS_KEY]:
-				if a[util.TYPE_KEY] == "A":
-					host_set += [a[util.ANSWER_DATA_KEY]]
+			for a in query[utils.ANSWERS_KEY]:
+				if a[utils.TYPE_KEY] == "A" or a[utils.TYPE_KEY] == "CNAME":
+					host_set += [a[utils.ANSWER_DATA_KEY]]
 		name = host_info[utils.NAME_KEY]
 		if name not in host_to_ip:
 			host_to_ip[name] = []
@@ -323,7 +308,7 @@ def count_different_dns_responses(filename1, filename2):
 		for query in host_info[utils.QUERIES_KEY]:
 			host_set = []
 			for a in query[utils.ANSWERS_KEY]:
-				if a[utils.TYPE_KEY] == "A":
+				if a[utils.TYPE_KEY] == "A" or a[utils.TYPE_KEY] == "CNAME":
 					host_set += [a[utils.ANSWER_DATA_KEY]]
 		name = host_info[utils.NAME_KEY]
 		if name not in host_to_ip_2:
@@ -335,7 +320,7 @@ def count_different_dns_responses(filename1, filename2):
 		sets = host_to_ip[host]
 		if sets[0] != sets[1] or sets[2] != sets[1] or sets[2] != sets[3] or sets[3] != sets[4]:
 			first_value += 1
-			print(host + " : first_value")
+			#print(host + " : first_value")
 		else:
 			if host not in host_to_ip_2:
 				continue
@@ -350,10 +335,10 @@ def count_different_dns_responses(filename1, filename2):
 					#print(sets2)
 					for s in sets2:
 						if s not in sets1:
-							print(host + ": second_value")
+							#print(host + ": second_value")
 							second_value += 1
 							break
 
 	return [first_value, second_value + first_value]
 
-#print(count_different_dns_responses("q3/first_run.json", "q3/from_italy.json"))
+#print(count_different_dns_responses("q3/dns_output_1.json", "q3/dns_output_other_server.json"))

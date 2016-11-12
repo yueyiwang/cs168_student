@@ -12,7 +12,7 @@ def run_ping(hostnames, num_packets, raw_ping_output_filename, aggregated_ping_o
 		try: 
 			output = subprocess.check_output("ping -c " + str(num_packets) + " " + host, shell=True)
 			#output = subprocess.Popen("ping -c " + str(num_packets) + " " + host, shell=True)
-			print(output)
+			#print(output)
 			lines = output.split('\n')
 			for i in range(1, len(lines)-5):
 				parse = lines[i].split('=')
@@ -102,7 +102,7 @@ def plot_cdf(info, output_cdf_filename, num, host):
 				started = True
 			else:
 				y_values += [float(info[keys[i]])/float(num) + float(y_values[len(y_values) - 1])]
-	print(y_values)
+	#print(y_values)
 	plot.plot(x_values, y_values, label= host)
 	plot.legend() # This shows the legend on the plot.
 	plot.grid() # Show grid lines, which makes the plot easier to read.
@@ -163,6 +163,6 @@ def percent_has_drop(agg_ping_results_filesname):
 #print(percent_all_drop('rtt_a_agg.json'))
 #print(percent_has_drop('rtt_a_agg.json'))
 #plot_median_rtt_cdf("rtt_a_agg.json", "agg_rtt_cdf_a.pdf")
-plot_ping_cdf('rtt_b_raw.json', 'raw_rtt_cdf_b.pdf')
+#plot_ping_cdf('rtt_b_raw.json', 'raw_rtt_cdf_b.pdf')
 #run_ping(["google.com"], 100, "raw_google_output.json", "agg_google_output.json")
 #plot_ping_cdf('raw_google_output.json', 'raw_rtt_cdf.pdf')

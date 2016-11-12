@@ -1,8 +1,8 @@
 - PART 1 -
 
-
-1. Percentage of websites that did not respond at all: 0.22
-	Percentage of websites that had at least one dropped: 0.23
+1. 
+Percentage of websites that did not respond at all: 22%
+Percentage of websites that had at least one dropped: 23%
 
 2.
 todayhumor.co.kr: median RTT: 79.044, maximum RTT: 95.263, loss rate = 0.0
@@ -24,15 +24,15 @@ google.com: 14608.5
 zanvarsity.ac.tz: 5287.3
 
 Reasons not speed of light:
-1.) The ping does not travel through air and is not a straight line, so it will be slowed down through the different mediums (i.e. glass, fiber). 
-2.) There is no router that directly connects between Berkeley and each server so there will be extra distance and possible traffic to cause queuing delays and each router can cause transmission delays. 
+1.) The ping does not travel through a vacuum and is not a straight line, so it will be slowed down through the different mediums (i.e. glass, fiber). 
+2.) There is no router that directly connects between Berkeley and each server, so there will be extra distance and possible traffic to cause queuing delay, with each router also having possible transmission delays. 
 
 
 - PART 2 -
 
 1. 
-a.)AS directly connected to Berkeley: AS2152
-b.) Site that traverses most routers: zanvarsity.ac.tz and  www.vutbr.cz; site that traverse least routers: www.berkeley.edu
+a.) AS directly connected to Berkeley: AS2152
+b.) Site that traverses most routers: zanvarsity.ac.tz and www.vutbr.cz; site that traverse least routers: www.berkeley.edu
 c.) 
 mercury.lcs.mit.edu:
 [10.142.140.1] -> [128.32.0.58] -> [128.32.0.66] -> [137.164.27.132] -> [137.164.26.142] -> [198.71.45.24] -> [198.71.45.18] -> [198.71.45.14] -> [198.71.45.9] -> [192.5.89.17] -> [207.210.143.110] -> [18.192.7.1] -> [18.192.3.2, 18.192.2.2] -> [128.30.13.6] -> [128.30.0.246] -> [18.26.0.122]
@@ -61,10 +61,7 @@ www.city.kobe.lg.jp: 5
 zanvarsity.ac.tz: 5
 www.vutbr.cz: 2
 
-e.) One advantage of stable is that you can store less data since you only need one router for each destination. 
-
-
-
+e.) One advantage of stable routes is that you can store less data since you only need one router for each destination. It’ll also help to know the exact path of the packet.
 
 
 2.
@@ -86,20 +83,22 @@ route-server.east.bb.allstream.net
 # hops from server to my computer: 1 + dropped
 
 b.) All 4 are non symmetric
-c.) Routers may share same IP address, router failure, redirection of heavy traffic (different optimized path)
+c.) Routers may share same IP address; there may be router failure; there may be redirection of heavy traffic (different optimized path)
+
 
  - PART 3 -
- 3. a) average root TTL = 451.303, average TLD TTL=  172.80, average other TTL 124.883, terminating TTL = 8.108
+
+ 3. a) average root TTL = 451.303, average TLD TTL=  172.80, average other TTL 124.884, terminating TTL = 8.108
 b.) see graphs
 c.) 7, 10
-d.) 7, 82
+d.) 7, 20
 e.)
-Facebook is different
-us vs. france 
-157.240.2.35 vs 31.13.92.36
-57.921 vs. 162.472
+Website: Blogspot.com is different
+Location server: U.S. vs. Korea 
+IP: 172.217.5.105 vs. 216.58.203.41
+Ping time: 6.074 ms vs. 163.735 ms
 
-They are traveling different routes to different locations. They have different DNS servers for different locations, so it’ll travel to the closest one.
+They are traveling different routes to different locations and DNS servers. Thus, different DNS servers will choose the closest IP address, meaning that varying IP addresses can result in different latencies and load balancing results.
 
 
-f) It would be faster. Without +trace, the target nameserver resolves the query directly instead of resolving the query and reporting each result from the top down.
+f) It would be faster; without +trace, the target nameserver resolves the query directly, instead of resolving the query and reporting multiple results from the top down.
