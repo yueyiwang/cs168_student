@@ -52,7 +52,7 @@ def parse_no_dns_server(host, output):
 		elif tokens[0] == ";" or tokens[0] == ";;":
 			continue
 		current_answer = {}
-		current_answer[utils.QUERIED_NAME_KEY = tokens[0]
+		current_answer[utils.QUERIED_NAME_KEY] = tokens[0]
 		current_answer[utils.ANSWER_DATA_KEY] = tokens[4]
 		current_answer[utils.TYPE_KEY] = tokens[3]
 		if tokens[3] == "A":
@@ -188,7 +188,7 @@ def get_average_ttls(filename):
 	return [float(root_TTL)/roots, float(tld_TTL)/ tlds, float(other_TTL)/ others, float(a_TTL)/ answers]
 
 
-print(get_average_ttls("q3/first_run.json"))
+print(get_average_ttls("eric_dns_b.json"))
 
 def get_average_times(filename):
 	with open(filename) as fh:
