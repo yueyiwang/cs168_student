@@ -1,7 +1,7 @@
 # json keys for DNS output.
 NAME_KEY = "Name"
 SUCCESS_KEY = "Success"
-TIME_KEY = "Time"
+TIME_KEY = "Time in millis"
 ANSWERS_KEY = "Answers"
 QUERIES_KEY = "Queries"
 QUERIED_NAME_KEY = "Queried name"

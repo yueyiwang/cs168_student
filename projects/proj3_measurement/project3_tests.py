@@ -104,7 +104,7 @@ def tr_part_a_check(text):
     print "Traceroute part a PASS"
                     
 def tr_part_b_check(text):
-    sites = ["route-server.ip-plus.net", "route-views.oregon-ix.net", "route-server.eastern.allstream.com", "route-views.on.bb.telus.com"]
+    sites = ["tpr-route-server.saix.net", "route-server.ip-plus.net", "route-views.oregon-ix.net", "route-server.eastern.allstream.com"]
     
     lines = text.split('\n')
 
