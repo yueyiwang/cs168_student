@@ -210,4 +210,4 @@ You don't need to worry about the case when the WAN optimizer receives an invali
 
 #### Does my WAN optimizer need to handle traffic between two clients that are both connected to the same WAN optimizer?
 
-No, you don't need to handle this case.  You can assume all traffic will traverse both WAN optimizers.
+No, you don't need to handle this case.  You can assume all traffic will traverse both WAN optimizers. 
